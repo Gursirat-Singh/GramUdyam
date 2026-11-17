@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Hyper-Local Market Insights — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Hyper-Local Market Research &amp; Field Observations</h1>
+    <p class="page-subtitle">
+      Area: <strong>{{ profile.village_or_town|default:"Local Village" }}, {{ profile.district|default:"Local District" }} ({{ profile.state }})</strong>
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'market_insights:add_observation' %}" class="btn btn-primary">+ Log New Market Observation</a>
+    <a href="{% url 'market_insights:schemes_list' %}" class="btn btn-accent">Explore Govt Funding Schemes</a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>Data Transparency Notice:</strong> {{ synthesis.evidence_label }}.
+  <em>Geographic personalization alone is never treated as verified market research; log primary observations from your block mandi and local shops below.</em>
+</div>
+
+<div class="card">
+  <form method="get" action="{% url 'market_insights:overview' %}" style="display:flex; gap:1rem; align-items:flex-end; flex-wrap:wrap;">
+    <div class="form-group" style="margin-bottom:0; min-width:280px;">
+      <label for="category-filter">Filter by Business Category</label>
+      <select id="category-filter" name="category">
+        <option value="">All Rural Business Categories</option>
+        {% for c_key, c_label in categories %}
+          <option value="{{ c_key }}" {% if selected_category == c_key %}selected{% endif %}>{{ c_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Apply Category Filter</button>
+  </form>
+</div>
+
+<div class="dashboard-two-col">
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Evidence-Based Local Recommendations</h2>
+      <span class="badge badge-info">{{ synthesis.evidence_label }}</span>
+    </div>
+    <ul>
+      {% for rec in synthesis.recommendations %}
+        <li style="margin-bottom: 0.65rem;">{{ rec }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Sector Field Verification Checklist</h2>
+      <span class="badge badge-warning">{{ guidance.label }}</span>
+    </div>
+    <p><strong>Seasonal Factors:</strong> {{ guidance.seasonal_factors }}</p>
+    <p><strong>Supplier Check:</strong> {{ guidance.supplier_tips }}</p>
+    <p><strong>Pricing Verification:</strong> {{ guidance.pricing_checklist }}</p>
+  </section>
+</div>
+
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Your Recorded Local Market Observations</h2>
+    <a href="{% url 'market_insights:add_observation' %}" class="btn btn-primary btn-sm">+ Add Observation</a>
+  </div>
+  {% if observations %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Subject / Mandi / Competitor</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Price / Metric</th>
+            <th>Competitors</th>
+            <th>Demand</th>
+            <th>Data Label</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for obs in observations %}
+            <tr>
+              <td>{{ obs.observed_date }}</td>
+              <td>
+                <strong>{{ obs.subject_name }}</strong>
+                <div class="help-text">{{ obs.details }}</div>
+              </td>
+              <td>{{ obs.get_observation_type_display }}</td>
+              <td>{{ obs.village_or_town }}, {{ obs.district }}</td>
+              <td>{{ obs.observed_price_or_metric|default:"—" }}</td>
+              <td>{{ obs.competitor_count|default:"—" }}</td>
+              <td><span class="badge badge-info">{{ obs.demand_level }}</span></td>
+              <td><span class="badge badge-warning">{{ obs.get_data_source_type_display }}</span></td>
+              <td>
+                <form method="post" action="{% url 'market_insights:delete_observation' pk=obs.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "components/pagination.html" %}
+  {% else %}
+    <div class="empty-state">
+      <h3>No Local Observations Logged Yet</h3>
+      <p>Record competitor counts, local selling prices, and supplier availability from your village or block mandi.</p>
+      <a href="{% url 'market_insights:add_observation' %}" class="btn btn-primary">Record First Observation</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

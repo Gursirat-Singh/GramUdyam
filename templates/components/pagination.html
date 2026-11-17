@@ -1,0 +1,27 @@
+{% if page_obj and page_obj.has_other_pages %}
+  <nav class="pagination" aria-label="Pagination" style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-top:2rem; flex-wrap:wrap;">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm" aria-label="Previous Page">
+        &larr; Previous
+      </a>
+    {% else %}
+      <span class="btn btn-secondary btn-sm" style="opacity:0.4; cursor:not-allowed;" aria-disabled="true">
+        &larr; Previous
+      </span>
+    {% endif %}
+
+    <span style="font-size:0.9rem; font-weight:600; color:var(--color-text-muted); padding:0.4rem 0.85rem; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+      Page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong>
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm" aria-label="Next Page">
+        Next &rarr;
+      </a>
+    {% else %}
+      <span class="btn btn-secondary btn-sm" style="opacity:0.4; cursor:not-allowed;" aria-disabled="true">
+        Next &rarr;
+      </span>
+    {% endif %}
+  </nav>
+{% endif %}

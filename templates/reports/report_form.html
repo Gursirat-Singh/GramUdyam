@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Create Business & Financial Report — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Generate Saved Business &amp; Financial Dossier</h1>
+    <p class="page-subtitle">Select your Business Plan and/or Financial Plan to compile a print-friendly and PDF-exportable report.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'reports:list' %}" class="btn btn-secondary">Back to Reports</a>
+  </div>
+</div>
+
+<div class="card">
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for err in form.non_field_errors %}{{ err }}<br>{% endfor %}
+    </div>
+  {% endif %}
+  <form method="post" action="{% url 'reports:create' %}" data-loading-text="Compiling report...">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span>{% endif %}
+        {% if field.errors %}
+          <ul class="field-errors">{% for err in field.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Compile &amp; Save Report</button>
+  </form>
+</div>
+{% endblock %}

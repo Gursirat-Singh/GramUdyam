@@ -1,0 +1,38 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div style="flex: 1.5; min-width: 260px;">
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <span style="font-size:1.3rem;">🌾</span>
+        <strong style="font-size:1.05rem; color:#FFFFFF;">GramUdyam Advisory</strong>
+      </div>
+      <p class="footer-disclaimer">
+        AI-driven hyper-local micro-enterprise planning platform designed for rural self-help groups (SHGs),
+        Farmer Producer Organizations (FPOs), and village entrepreneurs.
+      </p>
+      <div style="font-size:0.8rem; color:#A7B7A7; margin-top:0.75rem;">
+        Deterministic Decimal Arithmetic Engine &bull; Zero Speculative Data Generation
+      </div>
+    </div>
+
+    <div style="flex: 1; min-width: 180px;">
+      <div style="color:#FFFFFF; font-weight:700; margin-bottom:0.6rem; font-size:0.95rem;">Key Resources</div>
+      <ul style="list-style:none; padding:0; margin:0; font-size:0.88rem; line-height:1.9;">
+        <li><a href="{% url 'market_insights:schemes_list' %}" style="color:#D8F3DC; text-decoration:none;">🏛️ Govt Schemes Directory</a></li>
+        <li><a href="{% url 'business_advisor:create' %}" style="color:#D8F3DC; text-decoration:none;">🌾 Business Advisory Wizard</a></li>
+        <li><a href="{% url 'financial_planning:create' %}" style="color:#D8F3DC; text-decoration:none;">💰 Financial Break-Even Modeler</a></li>
+        <li><a href="{% url 'market_insights:add_observation' %}" style="color:#D8F3DC; text-decoration:none;">📊 Record Field Observation</a></li>
+      </ul>
+    </div>
+
+    <div style="flex: 1.2; min-width: 240px;">
+      <div style="color:#FFFFFF; font-weight:700; margin-bottom:0.6rem; font-size:0.95rem;">Transparency Note</div>
+      <p class="footer-disclaimer" style="margin:0;">
+        All financial projections are computed strictly from user-entered assumptions using Python Decimal arithmetic.
+        Government scheme data provides general policy guidance from official portals and does not constitute guaranteed loan or subsidy sanction.
+      </p>
+      <div style="margin-top:0.75rem; font-size:0.82rem; color:#A7B7A7;">
+        &copy; {% now "Y" %} GramUdyam AI &bull; Server-Rendered Django Architecture
+      </div>
+    </div>
+  </div>
+</footer>

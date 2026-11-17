@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Saved Plans & Exportable Reports — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Saved Plans, Scenario Comparisons &amp; Exportable Reports</h1>
+    <p class="page-subtitle">Manage your saved business plans, financial models, print-friendly dossiers, and PDF exports.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'reports:create' %}" class="btn btn-primary">+ Create New Report</a>
+    <a href="{% url 'reports:compare' %}" class="btn btn-accent">Scenario Comparison Tool</a>
+  </div>
+</div>
+
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Generated Dossier Reports (Print &amp; PDF Ready)</h2>
+  </div>
+  {% if reports %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Report Title</th>
+            <th>Type</th>
+            <th>Linked Business Plan</th>
+            <th>Linked Financial Model</th>
+            <th>Generated Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rep in reports %}
+            <tr>
+              <td><a href="{% url 'reports:detail' pk=rep.pk %}"><strong>{{ rep.title }}</strong></a></td>
+              <td><span class="badge badge-info">{{ rep.get_report_type_display }}</span></td>
+              <td>{% if rep.business_plan %}{{ rep.business_plan.title }}{% else %}—{% endif %}</td>
+              <td>{% if rep.financial_plan %}{{ rep.financial_plan.title }}{% else %}—{% endif %}</td>
+              <td>{{ rep.generated_at|date:"Y-m-d" }}</td>
+              <td>
+                <a href="{% url 'reports:detail' pk=rep.pk %}" class="btn btn-secondary btn-sm">View / Print</a>
+                <a href="{% url 'reports:export_pdf' pk=rep.pk %}" class="btn btn-primary btn-sm">Export PDF</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "components/pagination.html" %}
+  {% else %}
+    <div class="empty-state">
+      <h3>No Saved Reports Yet</h3>
+      <p>Combine any of your Business Plans and Financial Models into a print-ready and PDF-exportable dossier.</p>
+      <a href="{% url 'reports:create' %}" class="btn btn-primary">Generate First Report</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

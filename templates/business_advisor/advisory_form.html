@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Generate Business Advisory — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">AI &amp; Rule-Based Hyper-Local Business Advisory</h1>
+    <p class="page-subtitle">
+      Tell us about your location, investment budget, skills, and local constraints. When no external AI API key is configured,
+      our deterministic Rule-Based Domain Engine generates verified sector templates clearly labelled as offline guidance.
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'business_advisor:list' %}" class="btn btn-secondary">Back to Plans</a>
+  </div>
+</div>
+
+<div class="card">
+  <form method="post" action="{% url 'business_advisor:create' %}" data-loading-text="Generating hyper-local recommendations...">
+    {% csrf_token %}
+    <div class="form-grid">
+      {% for field in form %}
+        <div class="form-group {% if field.name == 'existing_skills' or field.name == 'existing_resources' or field.name == 'business_objectives' or field.name == 'constraints' %}full-width{% endif %}">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span>{% endif %}
+          {% if field.errors %}
+            <ul class="field-errors">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="page-actions" style="margin-top: 1rem;">
+      <button type="submit" class="btn btn-primary">Generate Business Recommendations</button>
+      <a href="{% url 'business_advisor:list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

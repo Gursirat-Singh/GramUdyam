@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Edit Financial Plan{% else %}New Financial Plan{% endif %} — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{% if is_edit %}Edit Financial Assumptions: {{ plan.title }}{% else %}Interactive Financial Structuring &amp; Planning Form{% endif %}</h1>
+    <p class="page-subtitle">Enter your realistic cost, pricing, volume, and loan assumptions below. All projections recalculate automatically on save.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'financial_planning:list' %}" class="btn btn-secondary">Back to Financial Plans</a>
+  </div>
+</div>
+
+<div class="card">
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for err in form.non_field_errors %}{{ err }}<br>{% endfor %}
+    </div>
+  {% endif %}
+  <form method="post" data-loading-text="Calculating Decimal projections...">
+    {% csrf_token %}
+    <div class="form-grid">
+      {% for field in form %}
+        <div class="form-group {% if field.name == 'notes' or field.name == 'title' %}full-width{% endif %}">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span>{% endif %}
+          {% if field.errors %}
+            <ul class="field-errors">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="page-actions" style="margin-top: 1.25rem;">
+      <button type="submit" class="btn btn-primary">{% if is_edit %}Recalculate &amp; Save Changes{% else %}Calculate &amp; Save Financial Plan{% endif %}</button>
+      <a href="{% url 'financial_planning:list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

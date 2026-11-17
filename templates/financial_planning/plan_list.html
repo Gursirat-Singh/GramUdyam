@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Financial Structuring Plans — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Financial Structuring &amp; Break-Even Models ({{ total_count }})</h1>
+    <p class="page-subtitle">All models use exact Python Decimal calculations and separate user assumptions from computed projections.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-primary">+ Create Financial Plan</a>
+    <a href="{% url 'reports:compare' %}" class="btn btn-secondary">Compare Scenarios</a>
+  </div>
+</div>
+
+{% if plans %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Financial Model Title</th>
+            <th class="text-right">Startup Investment</th>
+            <th class="text-right">Monthly Revenue</th>
+            <th class="text-right">Monthly OpEx</th>
+            <th class="text-right">Monthly EBITDA</th>
+            <th class="text-right">Margin</th>
+            <th>Risk</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plan in plans %}
+            <tr>
+              <td><a href="{% url 'financial_planning:detail' pk=plan.pk %}"><strong>{{ plan.title }}</strong></a></td>
+              <td class="text-right">₹{{ plan.total_startup_investment }}</td>
+              <td class="text-right">₹{{ plan.estimated_monthly_revenue }}</td>
+              <td class="text-right">₹{{ plan.total_monthly_operating_cost }}</td>
+              <td class="text-right">₹{{ plan.estimated_monthly_ebitda }}</td>
+              <td class="text-right">{{ plan.profit_margin_percent }}%</td>
+              <td><span class="badge badge-{{ plan.risk_assessment|lower }}">{{ plan.risk_assessment }}</span></td>
+              <td>
+                <a href="{% url 'financial_planning:detail' pk=plan.pk %}" class="btn btn-secondary btn-sm">Open</a>
+                <a href="{% url 'financial_planning:edit' pk=plan.pk %}" class="btn btn-primary btn-sm">Edit</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "components/pagination.html" %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>No Financial Plans Created Yet</h3>
+    <p>Build a structured financial plan to estimate startup investment, break-even volume, loan EMI, and working capital.</p>
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-primary">Create Your First Financial Plan</a>
+  </div>
+{% endif %}
+{% endblock %}

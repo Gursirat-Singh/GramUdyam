@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.title }} — Financial Projections{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ plan.title }}</h1>
+    <p class="page-subtitle">
+      Risk Assessment: <span class="badge badge-{{ metrics.risk_assessment|lower }}">{{ metrics.risk_assessment }} RISK</span>
+      {% if plan.business_plan %}
+        &bull; Linked Venture: <a href="{% url 'business_advisor:detail' pk=plan.business_plan.pk %}">{{ plan.business_plan.title }}</a>
+      {% endif %}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'financial_planning:edit' pk=plan.pk %}" class="btn btn-primary">Edit Assumptions &amp; Recalculate</a>
+    <a href="{% url 'reports:create' %}?financial_plan={{ plan.pk }}" class="btn btn-accent">Export / Save Report</a>
+    <button type="button" data-action="print-page" class="btn btn-secondary">Print View</button>
+    <form method="post" action="{% url 'financial_planning:delete' pk=plan.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+{% if metrics.warnings %}
+  {% for warn in metrics.warnings %}
+    <div class="alert alert-warning">{{ warn }}</div>
+  {% endfor %}
+{% endif %}
+
+<section class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Startup Investment</div>
+    <div class="kpi-value">₹{{ metrics.total_startup_investment }}</div>
+    <div class="kpi-subtext">Working Capital ({{ plan.working_capital_months }}m): ₹{{ metrics.working_capital_requirement }}</div>
+  </div>
+  <div class="kpi-card accent">
+    <div class="kpi-label">Estimated Monthly Revenue</div>
+    <div class="kpi-value">₹{{ metrics.estimated_monthly_revenue }}</div>
+    <div class="kpi-subtext">{{ plan.expected_monthly_sales_volume }} units &times; ₹{{ plan.estimated_selling_price_per_unit }}/unit</div>
+  </div>
+  <div class="kpi-card success">
+    <div class="kpi-label">Monthly Profit (EBITDA)</div>
+    <div class="kpi-value">₹{{ metrics.estimated_monthly_ebitda }}</div>
+    <div class="kpi-subtext">Margin: {{ metrics.profit_margin_percent }}% &bull; Net After Interest: ₹{{ metrics.estimated_monthly_net_profit }}</div>
+  </div>
+  <div class="kpi-card warning">
+    <div class="kpi-label">Break-Even &amp; Payback</div>
+    <div class="kpi-value">{% if metrics.break_even_units != None %}{{ metrics.break_even_units }} units{% else %}N/A{% endif %}</div>
+    <div class="kpi-subtext">
+      Payback: {% if metrics.payback_period_months != None %}{{ metrics.payback_period_months }} months{% else %}Not Recoverable{% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="dashboard-two-col">
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">User-Entered Assumptions (Inputs)</h2>
+      <span class="badge badge-info">Entrepreneur Provided</span>
+    </div>
+    <table class="data-table">
+      <tbody>
+        <tr><th>Available Own Capital (Equity)</th><td class="text-right">₹{{ plan.available_capital }}</td></tr>
+        <tr><th>Equipment &amp; Setup Cost (One-Time)</th><td class="text-right">₹{{ plan.equipment_and_setup_cost }}</td></tr>
+        <tr><th>Initial Opening Inventory (One-Time)</th><td class="text-right">₹{{ plan.initial_inventory_cost }}</td></tr>
+        <tr><th>Licensing &amp; Contingency (One-Time)</th><td class="text-right">₹{{ plan.licensing_and_contingency }}</td></tr>
+        <tr><th>Monthly Raw Material / Input Cost</th><td class="text-right">₹{{ plan.monthly_raw_material_cost }}</td></tr>
+        <tr><th>Monthly Rent, Power &amp; Utilities</th><td class="text-right">₹{{ plan.monthly_rent_and_utilities }}</td></tr>
+        <tr><th>Monthly Salaries &amp; Labour</th><td class="text-right">₹{{ plan.monthly_salaries_and_labour }}</td></tr>
+        <tr><th>Monthly Transport &amp; Logistics</th><td class="text-right">₹{{ plan.monthly_transport_and_logistics }}</td></tr>
+        <tr><th>Monthly Marketing Expense</th><td class="text-right">₹{{ plan.monthly_marketing_expense }}</td></tr>
+        <tr><th>Other Recurring Monthly Expenses</th><td class="text-right">₹{{ plan.monthly_other_expenses }}</td></tr>
+        <tr><th>Estimated Selling Price per Unit</th><td class="text-right">₹{{ plan.estimated_selling_price_per_unit }}</td></tr>
+        <tr><th>Expected Monthly Sales Volume</th><td class="text-right">{{ plan.expected_monthly_sales_volume }} units</td></tr>
+        <tr><th>Loan Amount &amp; Interest Rate</th><td class="text-right">₹{{ plan.loan_amount }} @ {{ plan.annual_interest_rate }}% ({{ plan.loan_tenure_months }}m)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Calculated Financial Estimates (Outputs)</h2>
+      <span class="badge badge-success">Decimal Engine Computed</span>
+    </div>
+
+    <div class="fin-bar-chart" aria-label="Monthly Revenue vs Cost vs Profit Bar Chart">
+      <div class="fin-bar-row">
+        <div class="fin-bar-labels"><span>Monthly Revenue</span><span>₹{{ metrics.estimated_monthly_revenue }}</span></div>
+        <div class="fin-bar-track"><div class="fin-bar-fill revenue" style="width: {{ chart_bars.revenue_pct }}%;"></div></div>
+      </div>
+      <div class="fin-bar-row">
+        <div class="fin-bar-labels"><span>Monthly Operating Costs</span><span>₹{{ metrics.total_monthly_operating_cost }}</span></div>
+        <div class="fin-bar-track"><div class="fin-bar-fill cost" style="width: {{ chart_bars.opex_pct }}%;"></div></div>
+      </div>
+      <div class="fin-bar-row">
+        <div class="fin-bar-labels"><span>Operating Profit (EBITDA)</span><span>₹{{ metrics.estimated_monthly_ebitda }}</span></div>
+        <div class="fin-bar-track"><div class="fin-bar-fill profit" style="width: {{ chart_bars.ebitda_pct }}%;"></div></div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <tbody>
+        <tr><th>Total Startup Investment</th><td class="text-right"><strong>₹{{ metrics.total_startup_investment }}</strong></td></tr>
+        <tr><th>Working Capital Requirement ({{ plan.working_capital_months }}m)</th><td class="text-right">₹{{ metrics.working_capital_requirement }}</td></tr>
+        <tr><th>Total Capital Required (Startup + WC)</th><td class="text-right">₹{{ metrics.total_capital_required }}</td></tr>
+        <tr><th>Total Funding Available (Own + Loan)</th><td class="text-right">₹{{ metrics.total_funding_available }}</td></tr>
+        <tr><th>Unfunded Capital Gap</th><td class="text-right"><strong>₹{{ metrics.capital_gap }}</strong></td></tr>
+        <tr><th>Fixed Monthly Operating Cost</th><td class="text-right">₹{{ metrics.fixed_monthly_cost }}</td></tr>
+        <tr><th>Variable Monthly Cost</th><td class="text-right">₹{{ metrics.variable_monthly_cost }}</td></tr>
+        <tr><th>Unit Contribution Margin</th><td class="text-right">₹{{ metrics.unit_contribution_margin }}/unit</td></tr>
+        <tr><th>Break-Even Sales Volume</th><td class="text-right">{% if metrics.break_even_units != None %}{{ metrics.break_even_units }} units (₹{{ metrics.break_even_revenue }}){% else %}Not Reachable at Current Unit Margin{% endif %}</td></tr>
+        <tr><th>Monthly Loan EMI (Reducing Balance)</th><td class="text-right">₹{{ metrics.monthly_loan_emi }}/month</td></tr>
+        <tr><th>Cash Surplus After Loan EMI</th><td class="text-right"><strong>₹{{ metrics.monthly_cash_surplus_after_emi }}/month</strong></td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Three-Scenario Sensitivity Comparison (Conservative vs. Expected vs. Optimistic)</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Financial Metric</th>
+          <th class="text-right">{{ scenarios.conservative.label }}</th>
+          <th class="text-right">{{ scenarios.expected.label }}</th>
+          <th class="text-right">{{ scenarios.optimistic.label }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Scenario Assumptions</strong></td>
+          <td class="text-right">{{ scenarios.conservative.assumptions_note }}</td>
+          <td class="text-right">{{ scenarios.expected.assumptions_note }}</td>
+          <td class="text-right">{{ scenarios.optimistic.assumptions_note }}</td>
+        </tr>
+        <tr>
+          <td>Monthly Sales Volume &amp; Price</td>
+          <td class="text-right">{{ scenarios.conservative.sales_volume }} u @ ₹{{ scenarios.conservative.selling_price }}</td>
+          <td class="text-right">{{ scenarios.expected.sales_volume }} u @ ₹{{ scenarios.expected.selling_price }}</td>
+          <td class="text-right">{{ scenarios.optimistic.sales_volume }} u @ ₹{{ scenarios.optimistic.selling_price }}</td>
+        </tr>
+        <tr>
+          <td>Estimated Monthly Revenue</td>
+          <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_revenue }}</td>
+          <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_revenue }}</strong></td>
+          <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_revenue }}</td>
+        </tr>
+        <tr>
+          <td>Total Monthly Operating Cost</td>
+          <td class="text-right">₹{{ scenarios.conservative.total_monthly_operating_cost }}</td>
+          <td class="text-right">₹{{ scenarios.expected.total_monthly_operating_cost }}</td>
+          <td class="text-right">₹{{ scenarios.optimistic.total_monthly_operating_cost }}</td>
+        </tr>
+        <tr>
+          <td>Monthly Profit Before Tax &amp; Interest (EBITDA)</td>
+          <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_ebitda }}</td>
+          <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_ebitda }}</strong></td>
+          <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_ebitda }}</td>
+        </tr>
+        <tr>
+          <td>Operating Profit Margin (%)</td>
+          <td class="text-right">{{ scenarios.conservative.profit_margin_percent }}%</td>
+          <td class="text-right"><strong>{{ scenarios.expected.profit_margin_percent }}%</strong></td>
+          <td class="text-right">{{ scenarios.optimistic.profit_margin_percent }}%</td>
+        </tr>
+        <tr>
+          <td>Startup Payback Timeline</td>
+          <td class="text-right">{% if scenarios.conservative.payback_period_months != None %}{{ scenarios.conservative.payback_period_months }} mos{% else %}N/A{% endif %}</td>
+          <td class="text-right">{% if scenarios.expected.payback_period_months != None %}{{ scenarios.expected.payback_period_months }} mos{% else %}N/A{% endif %}</td>
+          <td class="text-right">{% if scenarios.optimistic.payback_period_months != None %}{{ scenarios.optimistic.payback_period_months }} mos{% else %}N/A{% endif %}</td>
+        </tr>
+        <tr>
+          <td>Scenario Risk Rating</td>
+          <td class="text-right"><span class="badge badge-{{ scenarios.conservative.risk_assessment|lower }}">{{ scenarios.conservative.risk_assessment }}</span></td>
+          <td class="text-right"><span class="badge badge-{{ scenarios.expected.risk_assessment|lower }}">{{ scenarios.expected.risk_assessment }}</span></td>
+          <td class="text-right"><span class="badge badge-{{ scenarios.optimistic.risk_assessment|lower }}">{{ scenarios.optimistic.risk_assessment }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Itemized Expense Register ({{ expense_items|length }} Items)</h2>
+  </div>
+  {% if expense_items %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Expense Type</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th class="text-right">Amount (₹)</th>
+            <th>Essential</th>
+            <th class="no-print">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in expense_items %}
+            <tr>
+              <td>{{ item.get_expense_type_display }}</td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.description }}</td>
+              <td class="text-right">₹{{ item.amount }}</td>
+              <td>{{ item.is_essential|yesno:"Yes,Optional" }}</td>
+              <td class="no-print">
+                <form method="post" action="{% url 'financial_planning:delete_expense' pk=plan.pk expense_id=item.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+  <form method="post" action="{% url 'financial_planning:add_expense' pk=plan.pk %}" class="no-print" style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid #E2E8F0;">
+    {% csrf_token %}
+    <h3 style="font-size:1rem; margin-top:0;">Add Granular Expense Line Item</h3>
+    <div class="form-grid">
+      <div class="form-group">{{ expense_form.expense_type.label_tag }}{{ expense_form.expense_type }}</div>
+      <div class="form-group">{{ expense_form.category.label_tag }}{{ expense_form.category }}</div>
+      <div class="form-group">{{ expense_form.description.label_tag }}{{ expense_form.description }}</div>
+      <div class="form-group">{{ expense_form.amount.label_tag }}{{ expense_form.amount }}</div>
+    </div>
+    <button type="submit" class="btn btn-secondary btn-sm">+ Add Expense Item</button>
+  </form>
+</section>
+
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Transparent Calculation Formulas &amp; Methodology</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Calculated Metric</th>
+          <th>Exact Formula Applied</th>
+          <th>Practical Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in formulas %}
+          <tr>
+            <td><strong>{{ f.metric }}</strong></td>
+            <td><code>{{ f.formula }}</code></td>
+            <td>{{ f.explanation }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

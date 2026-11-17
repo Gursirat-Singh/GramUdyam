@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Log Market Observation — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Record Hyper-Local Field Observation</h1>
+    <p class="page-subtitle">Log competitor counts, customer demand, supplier locations, or mandi prices observed in your area.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'market_insights:overview' %}" class="btn btn-secondary">Back to Market Insights</a>
+  </div>
+</div>
+
+<div class="card">
+  <form method="post" action="{% url 'market_insights:add_observation' %}" data-loading-text="Saving observation...">
+    {% csrf_token %}
+    <div class="form-grid">
+      {% for field in form %}
+        <div class="form-group {% if field.name == 'details' or field.name == 'subject_name' %}full-width{% endif %}">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span>{% endif %}
+          {% if field.errors %}
+            <ul class="field-errors">{% for err in field.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">Save Field Observation</button>
+  </form>
+</div>
+{% endblock %}

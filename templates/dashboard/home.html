@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}GramUdyam AI — Hyper-Local Rural Business &amp; Financial Advisory{% endblock %}
+{% block content %}
+<section class="hero-banner">
+  <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.15); padding:0.35rem 0.85rem; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:600; margin-bottom:1.25rem; color:#D8F3DC;">
+    <span>🌾</span> Empowering Rural Entrepreneurs, SHGs &amp; FPOs
+  </div>
+  <h1>Build Viable Rural Micro-Enterprises with Grounded Financial &amp; Local Market Planning</h1>
+  <p>
+    Discover high-opportunity village and block-level ventures, calculate exact startup investments and break-even sales
+    using deterministic Decimal arithmetic, record hyper-local mandi observations, and generate bank-ready project dossiers.
+  </p>
+  <div class="page-actions" style="margin-top:1.5rem;">
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard:index' %}" class="btn btn-accent" style="box-shadow:0 4px 14px rgba(217,119,6,0.4);">
+        📊 Open Your Entrepreneur Dashboard
+      </a>
+      <a href="{% url 'business_advisor:create' %}" class="btn btn-secondary" style="background:rgba(255,255,255,0.15); color:#FFFFFF; border-color:rgba(255,255,255,0.5);">
+        + New Business Advisory
+      </a>
+    {% else %}
+      <a href="{% url 'accounts:register' %}" class="btn btn-accent" style="box-shadow:0 4px 14px rgba(217,119,6,0.4);">
+        ✨ Create Entrepreneur Account
+      </a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-secondary" style="background:rgba(255,255,255,0.15); color:#FFFFFF; border-color:rgba(255,255,255,0.5);">
+        🔑 Sign In to Existing Account
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat-item">
+      <span class="hero-stat-number">100%</span>
+      <span class="hero-stat-desc">Deterministic Decimal Math</span>
+    </div>
+    <div class="hero-stat-item">
+      <span class="hero-stat-number">{{ scheme_count|default:"6" }} Verified</span>
+      <span class="hero-stat-desc">Central Government Schemes</span>
+    </div>
+    <div class="hero-stat-item">
+      <span class="hero-stat-number">3 Scenarios</span>
+      <span class="hero-stat-desc">Sensitivity Stress Testing</span>
+    </div>
+    <div class="hero-stat-item">
+      <span class="hero-stat-number">PDF &amp; Print</span>
+      <span class="hero-stat-desc">Bank Appraisal Dossiers</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Core Pillars ──────────────────────────────────────────────────────── -->
+<div class="feature-grid">
+  <article class="feature-card">
+    <div>
+      <div class="feature-icon-circle">🌾</div>
+      <h2 class="card-title" style="margin-bottom:0.6rem;">1. Hyper-Local Advisory</h2>
+      <p style="color:var(--color-text-muted); font-size:0.95rem; line-height:1.6;">
+        Input your state, district, village/town, budget, existing vocational skills, and local constraints (like power cuts or cold storage lack).
+        Receive 3 structured micro-venture opportunities with equipment lists, target buyer segments, and risk mitigations.
+      </p>
+    </div>
+    <div style="margin-top:1.25rem;">
+      <span class="badge badge-info">AI Provider + Offline Heuristic Engine</span>
+    </div>
+  </article>
+
+  <article class="feature-card">
+    <div>
+      <div class="feature-icon-circle">💰</div>
+      <h2 class="card-title" style="margin-bottom:0.6rem;">2. Decimal Financial Engine</h2>
+      <p style="color:var(--color-text-muted); font-size:0.95rem; line-height:1.6;">
+        Model your startup capital, raw materials, wages, rent, and loan EMI without floating-point inaccuracies.
+        Compute exact break-even units, operating EBITDA, working capital reserves, and 3-scenario comparison (Lean, Base, Peak).
+      </p>
+    </div>
+    <div style="margin-top:1.25rem;">
+      <span class="badge badge-success">Transparent Formulas &bull; Zero Division by Zero</span>
+    </div>
+  </article>
+
+  <article class="feature-card">
+    <div>
+      <div class="feature-icon-circle">🏛️</div>
+      <h2 class="card-title" style="margin-bottom:0.6rem;">3. Market Notes &amp; {{ scheme_count }} Schemes</h2>
+      <p style="color:var(--color-text-muted); font-size:0.95rem; line-height:1.6;">
+        Log local price checks, supplier distances, and competitor counts from your weekly haat or mandi.
+        Match with verified central schemes (PMEGP, PMMY-MUDRA, PMFME, DAY-NRLM, Stand-Up India, AIF) with official portal links.
+      </p>
+    </div>
+    <div style="margin-top:1.25rem;">
+      <span class="badge badge-warning">Verified Policy Guidelines &bull; Portal Links</span>
+    </div>
+  </article>
+</div>
+
+<!-- ─── How It Works ─────────────────────────────────────────────────────── -->
+<section class="how-it-works-section">
+  <h2 class="how-it-works-title">How GramUdyam AI Works</h2>
+  <p class="how-it-works-subtitle">A simple 4-step workflow designed for rural entrepreneurs and community resource persons</p>
+
+  <div class="steps-strip">
+    <div class="step-card">
+      <div class="step-number">1</div>
+      <div class="step-title">Profile &amp; Context</div>
+      <div class="step-desc">Specify your location, available savings, family skills, and local physical constraints.</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">2</div>
+      <div class="step-title">Opportunity Matching</div>
+      <div class="step-desc">Our rule-based engine and AI provider match viable agro-allied and processing ventures.</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">3</div>
+      <div class="step-title">Financial Structuring</div>
+      <div class="step-desc">Calculate unit economics, monthly loan EMI, break-even targets, and working capital buffers.</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-number">4</div>
+      <div class="step-title">Bank Dossier &amp; PDF</div>
+      <div class="step-desc">Generate a professional, print-ready PDF project proposal ready for bank or scheme appraisal.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Why GramUdyam Card ───────────────────────────────────────────────── -->
+<div class="card" style="background:linear-gradient(135deg, #FDFAF4 0%, #FFFFFF 100%); border:1px solid #D8E2D8;">
+  <div class="card-header">
+    <h3 class="card-title" style="display:flex; align-items:center; gap:0.5rem;">
+      <span>🌱</span> Built on Radical Data Honesty &amp; Transparency
+    </h3>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; margin-top:0.5rem;">
+    <div>
+      <h4 style="color:var(--color-primary); margin:0 0 0.35rem 0;">✓ No Hallucinated Real-Time Stats</h4>
+      <p style="margin:0; font-size:0.9rem; color:var(--color-text-muted);">
+        We never invent real-time mandi prices or fake market statistics. Recommendations clearly state whether they come from the verified Rule-Based Heuristic Catalog or external AI.
+      </p>
+    </div>
+    <div>
+      <h4 style="color:var(--color-primary); margin:0 0 0.35rem 0;">✓ Exact Decimal Math</h4>
+      <p style="margin:0; font-size:0.9rem; color:var(--color-text-muted);">
+        Every single rupee and percentage is calculated using Python's <code>Decimal</code> module. No floating-point round-off surprises in your loan amortization or unit contribution margin.
+      </p>
+    </div>
+    <div>
+      <h4 style="color:var(--color-primary); margin:0 0 0.35rem 0;">✓ Bank-Grade Dossiers</h4>
+      <p style="margin:0; font-size:0.9rem; color:var(--color-text-muted);">
+        Dossiers cleanly separate user-entered assumptions from calculated forecasts, with explicit formulas and methodology disclosures suitable for bank credit officers.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

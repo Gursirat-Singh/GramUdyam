@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Scenario Comparison — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Financial Scenario &amp; Multi-Plan Comparison</h1>
+    <p class="page-subtitle">Compare your saved financial models side-by-side and inspect Conservative, Expected, and Optimistic outcomes.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-primary">+ New Financial Model</a>
+  </div>
+</div>
+
+{% if financial_plans %}
+  <section class="card">
+    <h2 class="card-title">All Saved Financial Models Comparison</h2>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Model Title</th>
+            <th class="text-right">Startup Cap</th>
+            <th class="text-right">Working Cap</th>
+            <th class="text-right">Monthly Rev</th>
+            <th class="text-right">Monthly OpEx</th>
+            <th class="text-right">EBITDA</th>
+            <th class="text-right">Margin</th>
+            <th class="text-right">Break-Even</th>
+            <th>Inspect 3-Scenarios</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fp in financial_plans %}
+            <tr>
+              <td><a href="{% url 'financial_planning:detail' pk=fp.pk %}"><strong>{{ fp.title }}</strong></a></td>
+              <td class="text-right">₹{{ fp.total_startup_investment }}</td>
+              <td class="text-right">₹{{ fp.working_capital_requirement }}</td>
+              <td class="text-right">₹{{ fp.estimated_monthly_revenue }}</td>
+              <td class="text-right">₹{{ fp.total_monthly_operating_cost }}</td>
+              <td class="text-right">₹{{ fp.estimated_monthly_ebitda }}</td>
+              <td class="text-right">{{ fp.profit_margin_percent }}%</td>
+              <td class="text-right">{{ fp.break_even_units|default:"N/A" }} u</td>
+              <td><a href="?plan_id={{ fp.pk }}" class="btn btn-secondary btn-sm">Inspect Stress Test</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if active_plan and scenarios %}
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">3-Scenario Stress Test for: {{ active_plan.title }}</h2>
+        <a href="{% url 'financial_planning:edit' pk=active_plan.pk %}" class="btn btn-primary btn-sm">Edit Model Assumptions</a>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th class="text-right">{{ scenarios.conservative.label }}</th>
+              <th class="text-right">{{ scenarios.expected.label }}</th>
+              <th class="text-right">{{ scenarios.optimistic.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monthly Revenue</td>
+              <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_revenue }}</td>
+              <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_revenue }}</strong></td>
+              <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_revenue }}</td>
+            </tr>
+            <tr>
+              <td>Monthly Operating Cost</td>
+              <td class="text-right">₹{{ scenarios.conservative.total_monthly_operating_cost }}</td>
+              <td class="text-right">₹{{ scenarios.expected.total_monthly_operating_cost }}</td>
+              <td class="text-right">₹{{ scenarios.optimistic.total_monthly_operating_cost }}</td>
+            </tr>
+            <tr>
+              <td>Monthly Profit (EBITDA)</td>
+              <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_ebitda }}</td>
+              <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_ebitda }}</strong></td>
+              <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_ebitda }}</td>
+            </tr>
+            <tr>
+              <td>Profit Margin (%)</td>
+              <td class="text-right">{{ scenarios.conservative.profit_margin_percent }}%</td>
+              <td class="text-right"><strong>{{ scenarios.expected.profit_margin_percent }}%</strong></td>
+              <td class="text-right">{{ scenarios.optimistic.profit_margin_percent }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <h3>No Financial Models Available to Compare</h3>
+    <p>Create at least one financial plan to run scenario comparisons.</p>
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-primary">Create Financial Plan</a>
+  </div>
+{% endif %}
+{% endblock %}

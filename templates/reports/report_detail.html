@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ report.title }} — Dossier Report{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ report.title }}</h1>
+    <p class="page-subtitle">
+      {{ report.get_report_type_display }} &bull; Prepared for <strong>{{ report.user.get_full_name }}</strong>
+      &bull; Generated: {{ report.generated_at|date:"Y-m-d" }}
+    </p>
+  </div>
+  <div class="page-actions no-print">
+    <a href="{% url 'reports:export_pdf' pk=report.pk %}" class="btn btn-primary">Download PDF Report</a>
+    <button type="button" data-action="print-page" class="btn btn-accent">Print Friendly View</button>
+    <form method="post" action="{% url 'reports:delete' pk=report.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete Report</button>
+    </form>
+  </div>
+</div>
+
+<section class="card">
+  <h2 class="card-title">1. Executive Summary</h2>
+  <p>{{ report.executive_summary|linebreaksbr }}</p>
+</section>
+
+{% if report.business_plan %}
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">2. Hyper-Local Venture Profile: {{ report.business_plan.title }}</h2>
+      <span class="badge badge-info">{{ report.business_plan.get_advisory_source_display }}</span>
+    </div>
+    <p>
+      <strong>Location:</strong> {{ report.business_plan.village_or_town }}, {{ report.business_plan.district }}, {{ report.business_plan.state }} &bull;
+      <strong>Category:</strong> {{ report.business_plan.get_business_category_display }} &bull;
+      <strong>Investment Budget:</strong> ₹{{ report.business_plan.investment_budget }}
+    </p>
+    {% if recommendations %}
+      <h3>Recommended Venture Tracks</h3>
+      {% for rec in recommendations %}
+        <div class="rec-box" style="margin-bottom:0.85rem;">
+          <h4>{{ rec.opportunity_name }} ({{ rec.suitability_score }}% Suitability — Est. Startup ₹{{ rec.estimated_startup_cost }})</h4>
+          <p><strong>Setup:</strong> {{ rec.initial_setup_requirements }}</p>
+          <p><strong>Risks &amp; Mitigation:</strong> {{ rec.major_risks }} | {{ rec.mitigation_measures }}</p>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </section>
+{% endif %}
+
+{% if report.financial_plan and metrics %}
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">3. Financial Structuring &amp; Projections: {{ report.financial_plan.title }}</h2>
+      <span class="badge badge-{{ metrics.risk_assessment|lower }}">{{ metrics.risk_assessment }} RISK</span>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Classification</th>
+            <th>Metric</th>
+            <th class="text-right">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>User Assumption</td><td>Available Own Capital</td><td class="text-right">₹{{ report.financial_plan.available_capital }}</td></tr>
+          <tr><td>User Assumption</td><td>Selling Price &amp; Monthly Sales Volume</td><td class="text-right">₹{{ report.financial_plan.estimated_selling_price_per_unit }} &times; {{ report.financial_plan.expected_monthly_sales_volume }} units</td></tr>
+          <tr><td>User Assumption</td><td>Loan Amount &amp; Interest Rate</td><td class="text-right">₹{{ report.financial_plan.loan_amount }} @ {{ report.financial_plan.annual_interest_rate }}%</td></tr>
+          <tr><td><strong>Calculated Estimate</strong></td><td><strong>Total Startup Investment</strong></td><td class="text-right"><strong>₹{{ metrics.total_startup_investment }}</strong></td></tr>
+          <tr><td><strong>Calculated Estimate</strong></td><td><strong>Total Monthly Operating Cost</strong></td><td class="text-right"><strong>₹{{ metrics.total_monthly_operating_cost }}</strong></td></tr>
+          <tr><td><strong>Calculated Estimate</strong></td><td><strong>Estimated Monthly Revenue</strong></td><td class="text-right"><strong>₹{{ metrics.estimated_monthly_revenue }}</strong></td></tr>
+          <tr><td><strong>Calculated Estimate</strong></td><td><strong>Monthly Operating Profit (EBITDA)</strong></td><td class="text-right"><strong>₹{{ metrics.estimated_monthly_ebitda }} ({{ metrics.profit_margin_percent }}%)</strong></td></tr>
+          <tr><td>Calculated Estimate</td><td>Break-Even Sales Volume</td><td class="text-right">{% if metrics.break_even_units != None %}{{ metrics.break_even_units }} units (₹{{ metrics.break_even_revenue }}){% else %}N/A{% endif %}</td></tr>
+          <tr><td>Calculated Estimate</td><td>Payback Timeline</td><td class="text-right">{% if metrics.payback_period_months != None %}{{ metrics.payback_period_months }} months{% else %}N/A{% endif %}</td></tr>
+          <tr><td>Calculated Estimate</td><td>Working Capital Reserve</td><td class="text-right">₹{{ metrics.working_capital_requirement }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+
+{% if scenarios %}
+  <section class="card">
+    <h2 class="card-title">4. Three-Scenario Sensitivity Analysis</h2>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="text-right">Conservative (-25% Vol)</th>
+            <th class="text-right">Expected (Baseline)</th>
+            <th class="text-right">Optimistic (+25% Vol)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Monthly Revenue</td>
+            <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_revenue }}</td>
+            <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_revenue }}</strong></td>
+            <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_revenue }}</td>
+          </tr>
+          <tr>
+            <td>Monthly Operating Cost</td>
+            <td class="text-right">₹{{ scenarios.conservative.total_monthly_operating_cost }}</td>
+            <td class="text-right">₹{{ scenarios.expected.total_monthly_operating_cost }}</td>
+            <td class="text-right">₹{{ scenarios.optimistic.total_monthly_operating_cost }}</td>
+          </tr>
+          <tr>
+            <td>Monthly Operating Profit (EBITDA)</td>
+            <td class="text-right">₹{{ scenarios.conservative.estimated_monthly_ebitda }}</td>
+            <td class="text-right"><strong>₹{{ scenarios.expected.estimated_monthly_ebitda }}</strong></td>
+            <td class="text-right">₹{{ scenarios.optimistic.estimated_monthly_ebitda }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

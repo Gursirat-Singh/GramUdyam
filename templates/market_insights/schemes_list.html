@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Government Schemes & Funding Guidance — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Government Schemes, Credit Subsidies &amp; Rural Enterprise Support</h1>
+    <p class="page-subtitle">Documented central schemes with eligibility criteria, required documents, and official application portals.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'market_insights:overview' %}" class="btn btn-secondary">Back to Market Insights</a>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <strong>Important Policy Disclaimer:</strong> The scheme details below provide general guidance from official government sources.
+  Final eligibility, credit appraisal, and subsidy sanction are determined exclusively by the nodal agency and lending bank.
+</div>
+
+<div class="card">
+  <form method="get" action="{% url 'market_insights:schemes_list' %}" style="display:flex; gap:1rem; align-items:flex-end; flex-wrap:wrap;">
+    <div class="form-group" style="margin-bottom:0; min-width:280px;">
+      <label for="scheme-cat">Filter Schemes by Business Category</label>
+      <select id="scheme-cat" name="category">
+        <option value="">Show All Schemes</option>
+        {% for c_key, c_label in categories %}
+          <option value="{{ c_key }}" {% if selected_category == c_key %}selected{% endif %}>{{ c_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter Schemes</button>
+  </form>
+</div>
+
+{% for scheme in schemes %}
+  <article class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title"><a href="{% url 'market_insights:scheme_detail' pk=scheme.pk %}">{{ scheme.name }}</a></h2>
+        <span class="help-text">{{ scheme.ministry_or_agency }} &bull; Last Verified: {{ scheme.last_verification_date }}</span>
+      </div>
+      <div>
+        <span class="badge badge-success">Up to ₹{{ scheme.max_funding_amount }}</span>
+        <span class="badge badge-info">{{ scheme.get_scheme_type_display }}</span>
+      </div>
+    </div>
+    <div class="rec-meta-grid">
+      <div class="rec-box">
+        <h4>Eligibility Criteria</h4>
+        <p>{{ scheme.eligibility_criteria|linebreaksbr }}</p>
+      </div>
+      <div class="rec-box">
+        <h4>Potential Benefits &amp; Subsidy</h4>
+        <p>{{ scheme.potential_benefits|linebreaksbr }}</p>
+      </div>
+    </div>
+    <div style="margin-top: 1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+      <a href="{% url 'market_insights:scheme_detail' pk=scheme.pk %}" class="btn btn-primary btn-sm">View Full Documents &amp; Application Steps</a>
+      <a href="{{ scheme.official_source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Official Portal ({{ scheme.short_code }}) &nearr;</a>
+    </div>
+  </article>
+{% endfor %}
+{% endblock %}

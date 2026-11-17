@@ -1,0 +1,81 @@
+{% load static %}
+<header class="site-header">
+  <nav class="navbar-container" aria-label="Primary Navigation">
+    <a href="{% url 'home' %}" class="brand-link">
+      <img src="{% static 'images/logo.svg' %}" alt="GramUdyam Logo" width="40" height="40">
+      <div>
+        <span>GramUdyam Advisory</span>
+        <span class="brand-subtitle">Hyper-Local Rural Business &amp; Financial Assistant</span>
+      </div>
+    </a>
+
+    <button type="button" id="mobile-menu-toggle" class="mobile-menu-toggle" aria-expanded="false" aria-controls="primary-nav-links">
+      <span aria-hidden="true">☰</span> Menu
+    </button>
+
+    <ul id="primary-nav-links" class="nav-links">
+      {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'dashboard:index' %}" class="{% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}">
+            <span aria-hidden="true">📊</span> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'business_advisor:list' %}" class="{% if request.resolver_match.app_name == 'business_advisor' %}active{% endif %}">
+            <span aria-hidden="true">🌾</span> Advisory
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'financial_planning:list' %}" class="{% if request.resolver_match.app_name == 'financial_planning' %}active{% endif %}">
+            <span aria-hidden="true">💰</span> Financials
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'market_insights:overview' %}" class="{% if request.resolver_match.url_name == 'overview' or request.resolver_match.url_name == 'add_observation' %}active{% endif %}">
+            <span aria-hidden="true">📈</span> Market
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'market_insights:schemes_list' %}" class="{% if request.resolver_match.url_name == 'schemes_list' or request.resolver_match.url_name == 'scheme_detail' %}active{% endif %}">
+            <span aria-hidden="true">🏛️</span> Schemes
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'reports:list' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+            <span aria-hidden="true">📄</span> Reports
+          </a>
+        </li>
+        <li class="nav-separator" aria-hidden="true"></li>
+        <li>
+          <a href="{% url 'accounts:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <span aria-hidden="true">👤</span> {{ user.get_short_name|default:user.username }}
+          </a>
+        </li>
+        <li>
+          <form method="post" action="{% url 'accounts:logout' %}" style="display:inline; margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="nav-logout-btn">
+              <span aria-hidden="true">🚪</span> Logout
+            </button>
+          </form>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'accounts:login' %}" class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+            Sign In
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'accounts:register' %}" class="nav-cta">
+            ✨ Register Entrepreneur
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>

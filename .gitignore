@@ -1,0 +1,116 @@
+# =============================================================================
+# .gitignore — GramVenture AI / Rural Business Advisor (Django)
+# Keeps secrets, databases, generated artifacts, and local debug output
+# out of version control.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Test / lint / type caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+
+# ---------------------------------------------------------------------------
+# Django
+# ---------------------------------------------------------------------------
+# Local SQLite database (dev + test)
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# Collected static files and user-uploaded media
+staticfiles/
+media/
+
+# Django logs & local settings
+*.log
+local_settings.py
+
+# ---------------------------------------------------------------------------
+# Secrets / environment variables
+# ---------------------------------------------------------------------------
+# Keep the template (.env.example) tracked; ignore everything else.
+.env
+.env.*
+!.env.example
+secrets.json
+*.key
+*.pem
+
+# ---------------------------------------------------------------------------
+# IDE / editor files
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-workspace
+*.sublime-project
+.vs/
+
+# ---------------------------------------------------------------------------
+# OS junk
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------------------------------------------------------------------------
+# Local QA / debug / test output generated in this workspace
+# ---------------------------------------------------------------------------
+dbg_*.txt
+debug_*.txt
+test_out.txt
+test_output.txt
+test_err.txt
+test_accounts.txt
+test_results.txt
+test_run_out.txt
+manage_test_out.txt
+full_test_out.txt
+qa_output.txt
+t_*.txt
+*_out.txt
+*_output.txt
+
+# One-off local debug / patch scripts (not part of the application)
+fix_pdf.py
+test_bugs.py
+test_bugs2.py
+qa_debug_dashboard.py
+qa_debug_reports.py

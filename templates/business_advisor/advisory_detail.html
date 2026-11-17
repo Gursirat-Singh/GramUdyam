@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.title }} — Business Advisory{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ plan.title }}</h1>
+    <p class="page-subtitle">
+      Location: <strong>{{ plan.village_or_town }}, {{ plan.district }}, {{ plan.state }}</strong> &bull;
+      Budget: <strong>₹{{ plan.investment_budget }}</strong> &bull;
+      Risk Indicator: <span class="badge badge-{{ plan.risk_level|lower }}">{{ plan.get_risk_level_display }}</span>
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'financial_planning:create' %}?business_plan={{ plan.pk }}" class="btn btn-accent">+ Structure Financial Plan</a>
+    <a href="{% url 'reports:create' %}?business_plan={{ plan.pk }}" class="btn btn-primary">Generate Dossier Report</a>
+    <form method="post" action="{% url 'business_advisor:delete' pk=plan.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete Plan</button>
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>Advisory Engine Source:</strong> {{ plan.get_advisory_source_display }}.
+  <em>Note: Recommendations are structured planning guidance and do not represent real-time local market statistics or guaranteed government scheme sanction.</em>
+</div>
+
+<section class="card">
+  <h2 class="card-title">Entrepreneur Inputs &amp; Local Context</h2>
+  <div class="rec-meta-grid">
+    <div class="rec-box">
+      <h4>Category &amp; Specific Idea</h4>
+      <p>{{ plan.get_business_category_display }}{% if plan.business_idea %} — <strong>{{ plan.business_idea }}</strong>{% endif %}</p>
+    </div>
+    <div class="rec-box">
+      <h4>Target Customers</h4>
+      <p>{{ plan.target_customers }}</p>
+    </div>
+    <div class="rec-box">
+      <h4>Existing Skills &amp; Resources</h4>
+      <p><strong>Skills:</strong> {{ plan.existing_skills }}<br><strong>Resources:</strong> {{ plan.existing_resources|default:"None specified" }}</p>
+    </div>
+    <div class="rec-box">
+      <h4>Objectives &amp; Local Constraints</h4>
+      <p><strong>Objectives:</strong> {{ plan.business_objectives }}<br><strong>Constraints:</strong> {{ plan.constraints|default:"None specified" }}</p>
+    </div>
+  </div>
+</section>
+
+<h2 style="color: var(--color-primary); margin-bottom: 1rem;">Structured Business Opportunity Recommendations ({{ recommendations|length }})</h2>
+
+{% for rec in recommendations %}
+  <article class="recommendation-card {% if rec.is_selected %}selected{% endif %}">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">{{ forloop.counter }}. {{ rec.opportunity_name }}</h3>
+        <span class="help-text">Source: {{ rec.source_label }}</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-success">{{ rec.suitability_score }}% Match</span>
+        <span class="badge badge-info">Est. Startup: ₹{{ rec.estimated_startup_cost }}</span>
+        {% if rec.is_selected %}
+          <span class="badge badge-warning">★ Primary Selected Track</span>
+        {% else %}
+          <form method="post" action="{% url 'business_advisor:select_recommendation' pk=plan.pk rec_id=rec.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary btn-sm">Select This Track</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="rec-meta-grid">
+      <div class="rec-box">
+        <h4>Why This Opportunity Suits Your Profile</h4>
+        <p>{{ rec.suitability_reasons|linebreaksbr }}</p>
+      </div>
+      <div class="rec-box">
+        <h4>Initial Setup &amp; Equipment Requirements</h4>
+        <p>{{ rec.initial_setup_requirements }}</p>
+      </div>
+      <div class="rec-box">
+        <h4>Target Customer Segments &amp; Marketing Strategy</h4>
+        <p><strong>Customers:</strong> {{ rec.potential_customer_segments }}</p>
+        <p><strong>Distribution:</strong> {{ rec.marketing_and_distribution }}</p>
+      </div>
+      <div class="rec-box">
+        <h4>Major Risks &amp; Mitigation Measures</h4>
+        <p><strong>Risks:</strong> {{ rec.major_risks }}</p>
+        <p><strong>Mitigation:</strong> {{ rec.mitigation_measures|linebreaksbr }}</p>
+      </div>
+    </div>
+
+    <div class="rec-box" style="margin-top: 1rem;">
+      <h4>Step-by-Step Practical Implementation Roadmap</h4>
+      <p>{{ rec.implementation_steps|linebreaksbr }}</p>
+    </div>
+  </article>
+{% endfor %}
+{% endblock %}

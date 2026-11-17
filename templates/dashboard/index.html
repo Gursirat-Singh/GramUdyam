@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Entrepreneur Dashboard — GramUdyam AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">
+      <span aria-hidden="true">👋</span> Welcome, {{ user.get_full_name|default:user.username }}
+    </h1>
+    <p class="page-subtitle">
+      Location: <strong>{{ profile.village_or_town|default:"Village Not Set" }}, {{ profile.district|default:"District Not Set" }} ({{ profile.state }})</strong>
+      &bull; Own Capital: <strong>₹{{ profile.available_capital }}</strong>
+      {% if profile.shg_or_fpo_member %}
+        &bull; <span class="badge badge-success">SHG / FPO Member</span>
+      {% endif %}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'business_advisor:create' %}" class="btn btn-primary">+ New Advisory</a>
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-accent">+ New Financial Plan</a>
+    <a href="{% url 'reports:create' %}" class="btn btn-secondary">Generate Dossier</a>
+  </div>
+</div>
+
+<!-- ─── Quick Actions Toolbar ──────────────────────────────────────────────── -->
+<div class="quick-actions-bar">
+  <div>
+    <div class="quick-actions-title">
+      <span>⚡</span> Quick Workflow Actions
+    </div>
+    <div class="quick-actions-subtitle">
+      Plan, calculate, and appraise your rural venture in 4 simple steps
+    </div>
+  </div>
+  <div class="quick-actions-btns">
+    <a href="{% url 'business_advisor:create' %}" class="btn btn-sm" style="background:#FFFFFF; color:var(--color-primary); font-weight:700;">
+      🌾 1. Match Idea
+    </a>
+    <a href="{% url 'financial_planning:create' %}" class="btn btn-sm" style="background:#FFFFFF; color:var(--color-primary); font-weight:700;">
+      💰 2. Structure Cashflow
+    </a>
+    <a href="{% url 'market_insights:add_observation' %}" class="btn btn-sm" style="background:#FFFFFF; color:var(--color-primary); font-weight:700;">
+      📊 3. Check Prices
+    </a>
+    <a href="{% url 'reports:create' %}" class="btn btn-sm" style="background:var(--color-accent-mid); color:#FFFFFF; font-weight:700;">
+      📄 4. Export Dossier
+    </a>
+  </div>
+</div>
+
+<!-- ─── KPI Metrics Grid ───────────────────────────────────────────────────── -->
+<section class="kpi-grid" aria-label="Key Financial and Business Metrics">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">
+        <span>📋</span> Plans Created
+      </div>
+      <div class="kpi-value">{{ total_bplans }}</div>
+    </div>
+    <div class="kpi-subtext">
+      <strong>{{ total_fplans }}</strong> Financial Models &bull; <strong>{{ total_reports }}</strong> Saved Reports
+    </div>
+  </div>
+
+  <div class="kpi-card accent">
+    <div>
+      <div class="kpi-label">
+        <span>🏗️</span> Startup Investment
+      </div>
+      <div class="kpi-value">₹{{ total_startup_capital }}</div>
+    </div>
+    <div class="kpi-subtext">
+      Combined across {{ total_fplans }} active financial plan{{ total_fplans|pluralize }}
+    </div>
+  </div>
+
+  <div class="kpi-card success">
+    <div>
+      <div class="kpi-label">
+        <span>💵</span> Est. Monthly Revenue
+      </div>
+      <div class="kpi-value">₹{{ total_monthly_revenue }}</div>
+    </div>
+    <div class="kpi-subtext">
+      Expenses: <strong>₹{{ total_monthly_expenses }}</strong>/mo &bull; EBITDA: <strong>₹{{ total_monthly_ebitda }}</strong>/mo
+    </div>
+  </div>
+
+  <div class="kpi-card warning">
+    <div>
+      <div class="kpi-label">
+        <span>⚖️</span> Portfolio Risk &amp; Margin
+      </div>
+      <div class="kpi-value">{{ avg_profit_margin }}% Margin</div>
+    </div>
+    <div class="kpi-subtext">
+      Overall Risk: <span class="badge badge-{{ overall_risk_badge|lower }}">{{ overall_risk_badge }}</span>
+      <span style="display:block; margin-top:0.2rem; font-size:0.75rem;">(H:{{ high_risk_count }} / M:{{ moderate_risk_count }} / L:{{ low_risk_count }})</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Two-Column Dashboard Body ─────────────────────────────────────────── -->
+<div class="dashboard-two-col">
+  <!-- Left Column -->
+  <div>
+    <!-- Recent Financial Plans -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title" style="display:flex; align-items:center; gap:0.45rem;">
+          <span>💰</span> Recent Financial Models
+        </h2>
+        <a href="{% url 'financial_planning:list' %}" class="btn btn-secondary btn-sm">View All ({{ total_fplans }})</a>
+      </div>
+      {% if recent_fplans %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Plan Title</th>
+                <th class="text-right">Startup Cap</th>
+                <th class="text-right">Monthly Rev</th>
+                <th class="text-right">EBITDA</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fp in recent_fplans %}
+                <tr>
+                  <td>
+                    <a href="{% url 'financial_planning:detail' pk=fp.pk %}">
+                      <strong>{{ fp.title }}</strong>
+                    </a>
+                  </td>
+                  <td class="text-right">₹{{ fp.total_startup_investment }}</td>
+                  <td class="text-right">₹{{ fp.estimated_monthly_revenue }}</td>
+                  <td class="text-right" style="color:var(--color-success); font-weight:600;">₹{{ fp.estimated_monthly_ebitda }}</td>
+                  <td>
+                    <span class="badge badge-{{ fp.risk_assessment|lower }}">{{ fp.risk_assessment }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div style="font-size:2.5rem; margin-bottom:0.5rem;">📊</div>
+          <h3>No Financial Plans Yet</h3>
+          <p>Model your equipment setup costs, raw materials, break-even sales volume, and 3-scenario projections.</p>
+          <a href="{% url 'financial_planning:create' %}" class="btn btn-primary">+ Create First Financial Model</a>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Recent Recommendations -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title" style="display:flex; align-items:center; gap:0.45rem;">
+          <span>💡</span> Recent Business Recommendations
+        </h2>
+        <a href="{% url 'business_advisor:list' %}" class="btn btn-secondary btn-sm">All Plans ({{ total_bplans }})</a>
+      </div>
+      {% if recent_recommendations %}
+        {% for rec in recent_recommendations %}
+          <div class="mini-item-card">
+            <div class="mini-item-title">
+              <a href="{% url 'business_advisor:detail' pk=rec.business_plan_id %}" style="font-weight:700; color:var(--color-primary);">
+                {{ rec.opportunity_name }}
+              </a>
+              <span class="badge badge-success">{{ rec.suitability_score }}% Match</span>
+            </div>
+            <div class="help-text" style="margin-top:0.35rem;">
+              Startup Cost: <strong>₹{{ rec.estimated_startup_cost }}</strong> &bull;
+              <span>{{ rec.source_label }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div style="font-size:2.5rem; margin-bottom:0.5rem;">🌾</div>
+          <h3>No Business Recommendations Yet</h3>
+          <p>Run the Business Advisor wizard to evaluate profitable ventures tailored to your village and budget.</p>
+          <a href="{% url 'business_advisor:create' %}" class="btn btn-primary">+ Run Advisory Wizard</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <!-- Market Observations -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title" style="display:flex; align-items:center; gap:0.45rem;">
+          <span>📍</span> Field Notes ({{ total_observations }})
+        </h2>
+        <a href="{% url 'market_insights:add_observation' %}" class="btn btn-secondary btn-sm">+ Log Note</a>
+      </div>
+      {% if recent_observations %}
+        {% for obs in recent_observations %}
+          <div class="mini-item-card">
+            <div class="mini-item-title">
+              <strong>{{ obs.subject_name }}</strong>
+              <span class="badge badge-info">{{ obs.get_observation_type_display }}</span>
+            </div>
+            <div class="help-text" style="margin-top:0.3rem;">
+              {{ obs.village_or_town }}, {{ obs.district }} &bull; Demand: <strong>{{ obs.demand_level }}</strong>
+              {% if obs.observed_price_or_metric %} &bull; <em>{{ obs.observed_price_or_metric }}</em>{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+        <div style="margin-top:1rem; text-align:center;">
+          <a href="{% url 'market_insights:overview' %}" style="font-size:0.88rem; font-weight:600;">
+            View full market analysis &rarr;
+          </a>
+        </div>
+      {% else %}
+        <p class="help-text" style="padding:0.5rem 0;">
+          No local field notes logged yet. Record mandi prices, supplier distances, and competitor counts to ground your feasibility analysis.
+        </p>
+        <a href="{% url 'market_insights:add_observation' %}" class="btn btn-secondary btn-sm">+ Log First Observation</a>
+      {% endif %}
+    </section>
+
+    <!-- Government Schemes -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title" style="display:flex; align-items:center; gap:0.45rem;">
+          <span>🏛️</span> Official Govt Schemes
+        </h2>
+        <a href="{% url 'market_insights:schemes_list' %}" class="btn btn-secondary btn-sm">All Schemes</a>
+      </div>
+      {% for scheme in featured_schemes %}
+        <div class="mini-item-card">
+          <div class="mini-item-title">
+            <a href="{% url 'market_insights:scheme_detail' pk=scheme.pk %}" style="font-weight:700; color:var(--color-primary);">
+              {{ scheme.name }}
+            </a>
+          </div>
+          <div class="help-text" style="margin-top:0.25rem;">
+            {{ scheme.ministry_or_agency|truncatechars:45 }} &bull; Max: <strong>₹{{ scheme.max_funding_amount }}</strong>
+          </div>
+        </div>
+      {% endfor %}
+      <div style="margin-top:1rem; text-align:center;">
+        <a href="{% url 'market_insights:schemes_list' %}" style="font-size:0.88rem; font-weight:600;">
+          Explore all verified subsidy schemes &rarr;
+        </a>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B4332">
+  <meta name="description" content="AI-driven hyper-local business advisory and financial structuring assistant for rural micro-entrepreneurs, SHGs, and FPOs across India.">
+  <title>{% block title %}GramUdyam AI — Hyper-Local Business &amp; Financial Advisory{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="page-load-bar" id="pageLoadBar"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="page-wrapper">
+    {% include "components/navbar.html" %}
+    <main id="main-content" class="main-container" role="main">
+      {% include "components/messages.html" %}
+      {% block content %}{% endblock %}
+    </main>
+    {% include "components/footer.html" %}
+  </div>
+  <script src="{% static 'js/main.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

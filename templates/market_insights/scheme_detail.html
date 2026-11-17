@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ scheme.name }} — Funding Guidance{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ scheme.name }}</h1>
+    <p class="page-subtitle">
+      Nodal Ministry / Agency: <strong>{{ scheme.ministry_or_agency }}</strong> &bull;
+      Last Verified: <strong>{{ scheme.last_verification_date }}</strong>
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{{ scheme.official_source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-accent">Visit Official Portal &nearr;</a>
+    <a href="{% url 'market_insights:schemes_list' %}" class="btn btn-secondary">All Schemes</a>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <strong>Non-Guarantee Notice:</strong> {{ scheme.disclaimer_note }}
+</div>
+
+<div class="card">
+  <div class="rec-meta-grid">
+    <div class="rec-box">
+      <h4>1. Eligibility Criteria</h4>
+      <p>{{ scheme.eligibility_criteria|linebreaksbr }}</p>
+    </div>
+    <div class="rec-box">
+      <h4>2. Potential Benefits &amp; Funding Ceiling</h4>
+      <p><strong>Maximum Funding Ceiling:</strong> ₹{{ scheme.max_funding_amount }}</p>
+      <p>{{ scheme.potential_benefits|linebreaksbr }}</p>
+    </div>
+    <div class="rec-box">
+      <h4>3. Required Documents Checklist</h4>
+      <p>{{ scheme.required_documents|linebreaksbr }}</p>
+    </div>
+    <div class="rec-box">
+      <h4>4. Step-by-Step Application Process</h4>
+      <p>{{ scheme.application_process|linebreaksbr }}</p>
+    </div>
+  </div>
+  <div style="margin-top: 1.25rem;">
+    <strong>Official Source URL:</strong>
+    <a href="{{ scheme.official_source_url }}" target="_blank" rel="noopener noreferrer">{{ scheme.official_source_url }}</a>
+  </div>
+</div>
+{% endblock %}
